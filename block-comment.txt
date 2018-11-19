@@ -1,0 +1,44 @@
+uint money = 0;
+uint month = 0;
+
+定義兩個變數儲存money與month
+
+event Buy_OK(address indexed from, uint256 timestamp);
+event Buy_month_OK(address indexed from, uint256 timestamp);
+
+通知web3與js有此事件存在
+
+ //定存 
+    function buy(uint m) public payable {
+        money = msg.value;
+        month = m;
+        emit BuyEvent(msg.sender, msg.value, now);
+        
+    }
+
+定義一個購買合約的動作，將金額與變數存入變數中，最後告知此事件結束。
+msg.value為放入合約的金額，m為呼叫的參數，依照這個數值決定購買幾期，並設置event監聽這個function。
+    
+    //合約期滿
+    function buy_OK() public payable {
+        balance[msg.sender] += (money + money*month/100);
+        money=0;
+        month=0;
+        emit Buy_OK(msg.sender,now);
+        
+    }
+
+定義一個合約期滿動作，當合約期滿時，結算本金加利息放入銀行存款中，並將變數歸零，最後告知此事件結束。
+    
+    //提早解約
+    function buy_n_OK(uint n) public payable {
+        balance[msg.sender] += (money + money*month/100*((month-n)*100/month)/100);
+        money=0;
+        month=0;
+        emit Buy_month_OK(msg.sender,now);
+        
+    }
+
+定義提早解約動作，結算提早解約的利息放入存款，將變數歸零後，告知事件結束。
+n為呼叫的參數，依照給定的值知道目前完成多少期。
+
